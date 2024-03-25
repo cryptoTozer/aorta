@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script defer type="module">
+      import { connect } from "https://unpkg.com/@permaweb/aoconnect";
+
+      const { dryrun } = connect();
+
+      async function getWebsite(processId) {
+        try {
+          const result = await dryrun({
+            process: processId,
+            tags: [{ name: "Action", value: "Get-Frame" }],
+          });
+
+          return result.Messages[0];
+        } catch (e) {
+          console.log(e);
+          return { Data: "GPh1vWALj54ZlRENIcPKNNCc8ZkBdWi4ThQxo37Hu4Q" };
+        }
+      }
+
+      (async () => {
+        let arns = false;
+        // get process id
+        let processId = await fetch(window.location.href).then((res) =>
+          res.headers.get("x-arns-resolved-id")
+        );
+        if (!processId) {
+          processId = window.location.href.split("/")[3];
+        } else {
+          arns = true;
+        }
+
+        const processResponse = await getWebsite(processId);
+
+        document.getElementById(
+          "body"
+        ).innerHTML = `<iframe style="border:0;width:100%;height:100%" src="https://uyzpfdljydqc7ozd5y6vrnue5ipcjfcehfy6i5xzfmo7rxxjee4a.g8way.io/${processResponse.Data}" />`;
+
+        // document.getElementById('body').innerHTML = `<iframe style="border:0;width:100%;height:100%" src="https://nodevietnam.com/${processResponse.Data}" />`
+      })();
+    </script>
+  </head>
+
+  <body id="body"></body>
+</html>
